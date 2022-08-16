@@ -24,10 +24,21 @@ class Game:
         self.player = Player(self, 1, 2)
 
     def events(self):
+        # game loop events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.playing = False
+                self.running = False
 
     def update(self):
+        # game loop updates
+        self.all_sprites.update()
 
     def draw(self):
+        self.screen.fill(BLACK)
+        self.all_sprites.draw(self.screen)
+        self.clock.tick(FPS)
+        pygame.display.update()
 
     def main(self):
         # game loop
@@ -38,5 +49,18 @@ class Game:
         self.running = False
 
     def game_over(self):
+        pass
 
     def intro_screen(self):
+        pass
+
+
+g = Game()
+g.intro_screen()
+g.new()
+while g.running:
+    g.main()
+    g.game_over()
+
+pygame.quit()
+sys.exit()
