@@ -93,6 +93,12 @@ class Player(pygame.sprite.Sprite):
                 if self.animation_loop >= 3:
                     self.animation_loop = 1
 
+    def collide_enemy(self):
+        hits = pygame.sprite.spritecollide(self, self.game.enemies, False)
+        if hits:
+            self.kill()
+            self.game.playing = False
+
     def collide_blocks(self, direction):
         if direction == "x":
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
@@ -113,6 +119,7 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         self.movement()
         self.animate()
+        self.collide_enemy()
 
         self.rect.x += self.x_change
         self.collide_blocks('x')
@@ -154,6 +161,11 @@ class Enemy(pygame.sprite.Sprite):
         self.x_change = 0
         self.y_change = 0
 
+        self.facing = random.choice(['left', 'right'])
+        self.animation_loop = 1
+        self.movement_loop = 0
+        self.max_travel = random.randint(7, 30)
+
         self.image = self.game.enemy_spritesheet.get_sprite(3, 2, self.width, self.height)
         self.image.set_colorkey(BLACK)
 
@@ -162,11 +174,54 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.y = self.y
 
     def update(self):
+        self.movement()
+        self.animate()
+
         self.rect.x += self.x_change
         self.rect.y += self.y_change
 
         self.x_change = 0
         self.y_change = 0
+
+    def movement(self):
+        if self.facing == 'left':
+            self.x_change -= ENEMY_SPEED
+            self.movement_loop -= 1
+            if self.movement_loop <= -self.max_travel:
+                self.facing = 'right'
+
+        if self.facing == 'right':
+            self.x_change += ENEMY_SPEED
+            self.movement_loop += 1
+            if self.movement_loop >= self.max_travel:
+                self.facing = 'left'
+
+    def animate(self):
+        left_animations = [self.game.enemy_spritesheet.get_sprite(3, 98, self.width, self.height),
+                           self.game.enemy_spritesheet.get_sprite(35, 98, self.width, self.height),
+                           self.game.enemy_spritesheet.get_sprite(68, 98, self.width, self.height)]
+
+        right_animations = [self.game.enemy_spritesheet.get_sprite(3, 66, self.width, self.height),
+                            self.game.enemy_spritesheet.get_sprite(35, 66, self.width, self.height),
+                            self.game.enemy_spritesheet.get_sprite(68, 66, self.width, self.height)]
+
+        if self.facing == "left":
+            if self.x_change == 0:
+                self.image = self.game.enemy_spritesheet.get_sprite(3, 98, self.width, self.height)
+            else:
+                self.image = left_animations[math.floor(self.animation_loop)]
+                self.animation_loop += 0.1
+                if self.animation_loop >= 3:
+                    self.animation_loop = 1
+
+        if self.facing == "right":
+            if self.x_change == 0:
+                self.image = self.game.enemy_spritesheet.get_sprite(3, 66, self.width, self.height)
+            else:
+                self.image = right_animations[math.floor(self.animation_loop)]
+                self.animation_loop += 0.1
+                if self.animation_loop >= 3:
+                    self.animation_loop = 1
 
 
 class Block(pygame.sprite.Sprite):
