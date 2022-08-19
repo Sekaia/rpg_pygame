@@ -29,7 +29,7 @@ class Game:
                 if column == "E":
                     Enemy(self, j, i)
                 if column == "P":
-                    Player(self, j, i)
+                    self.player = Player(self, j, i)
 
     def new(self):
         # New game starts
@@ -48,6 +48,17 @@ class Game:
             if event.type == pygame.QUIT:
                 self.playing = False
                 self.running = False
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    if self.player.facing == 'up':
+                        Attack(self, self.player.rect.x, self.player.rect.y - TILE_SIZE)
+                    if self.player.facing == 'down':
+                        Attack(self, self.player.rect.x, self.player.rect.y + TILE_SIZE)
+                    if self.player.facing == 'left':
+                        Attack(self, self.player.rect.x  - TILE_SIZE, self.player.rect.y)
+                    if self.player.facing == 'right':
+                        Attack(self, self.player.rect.x  + TILE_SIZE, self.player.rect.y)
 
     def update(self):
         # game loop updates

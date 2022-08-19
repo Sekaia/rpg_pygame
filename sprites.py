@@ -304,6 +304,10 @@ class Button:
 class Attack(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
+        self._layer = PLAYER_LAYER
+        self.groups = self.game.all_sprites, self.game.attacks
+        pygame.sprite.Sprite.__init__(self, self.groups)
+
         self.x = x
         self.y = y
         self.width = TILE_SIZE
@@ -325,7 +329,7 @@ class Attack(pygame.sprite.Sprite):
         hits = pygame.sprite.spritecollide(self, self.game.enemies, True)
 
     def animate(self):
-        direction = self.game.facing
+        direction = self.game.player.facing
 
         right_animations = [self.game.attack_spritesheet.get_sprite(0, 64, self.width, self.height),
                             self.game.attack_spritesheet.get_sprite(32, 64, self.width, self.height),
